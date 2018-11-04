@@ -117,7 +117,7 @@ class App extends React.Component {
   generateShortLink() {
     request({
       method: 'POST',
-      uri: '/api.short.cm/links',
+      uri: 'https://abcbin.yuzeh.com/api.short.cm/links',
       body: {
         domain: 'go.yuzeh.com',
         originalURL: location.href,
