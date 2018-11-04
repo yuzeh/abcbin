@@ -38,47 +38,36 @@ class App extends React.Component {
   render() {
     const { editorState, renderState, parseErrors } = this.state;
     const { shortLink, shortLinkedRenderState } = this.state;
-    return <div>
-      <NavBar 
-        shortLink={shortLink}
-        shortLinkedRenderState={shortLinkedRenderState}
-        renderState={renderState}
-        onShortLinkClick={() => this.generateShortLink()}
-        />
-      <div className="container-fluid content">
-        <div className="row">
-          <div className="col-lg-6 col-md-12">
-            <AbcEditor
-              onEditorUpdate={(v) => this.editorUpdate(v)}
-              editorState={editorState}
-              />
-          </div>
-          <div className="col-lg-6 col-md-12">
-            <div className="container-fluid">
-              <div className="row">
-                <div className="col"><pre>{parseErrors}</pre></div>
+    return [
+      <header>
+        <NavBar 
+          shortLink={shortLink}
+          shortLinkedRenderState={shortLinkedRenderState}
+          renderState={renderState}
+          onShortLinkClick={() => this.generateShortLink()}
+          />
+      </header>,
+      <main>
+        <div className="container-fluid content">
+          <div className="row">
+            <div className="col-lg-6 col-md-12">
+              <AbcEditor
+                onEditorUpdate={(v) => this.editorUpdate(v)}
+                editorState={editorState}
+                />
+            </div>
+            <div className="col-lg-6 col-md-12">
+              <div className="container-fluid">
+                <div className="row">
+                  <div className="col"><pre>{parseErrors}</pre></div>
+                </div>
+                <AbcRenderer notation={renderState} />
               </div>
-              <AbcRenderer notation={renderState} />
             </div>
           </div>
         </div>
-      </div>
-      <footer className='footer'>
-        <div className='container'>
-        <div className="row">
-          <div className="col d-flex justify-content-center">
-            <span class='text-muted'>
-              &copy; 2018 <a href="https://twitter.com/yuzeh">@yuzeh</a>
-              &nbsp;&middot;&nbsp;
-              <a href="https://github.com/yuzeh/abcbin">source</a>
-              &nbsp;&middot;&nbsp;
-              <a href="https://abcjs.net">built on top of abc.js</a>
-            </span>
-          </div>
-        </div>
-        </div>
-      </footer>
-    </div>;
+      </main>,
+    ];
   }
 
   tick() {
