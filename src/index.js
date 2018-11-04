@@ -7,6 +7,7 @@ import ReactDOM from 'react-dom';
 
 import abcjs from 'abcjs/midi';
 import b64js from 'base64-js';
+import request from 'request-promise-native';
 import pako from 'pako';
 
 class App extends React.Component {
@@ -18,6 +19,8 @@ class App extends React.Component {
       editorState: '',
       renderState: '',
       parseErrors: '',
+      shortLink: '',
+      shortLinkedRenderState: '',
     };
 
     this.state.editorState = decompress((window.location.hash || '#').slice(1)) || ABC;
@@ -34,27 +37,14 @@ class App extends React.Component {
 
   render() {
     const { editorState, renderState, parseErrors } = this.state;
+    const { shortLink, shortLinkedRenderState } = this.state;
     return <div>
-      <nav class="navbar sticky-top navbar-light bg-light">
-        <span class="navbar-brand" href="#">
-          <strong>abcbin</strong>
-          &nbsp;
-          <span className='navbar-text'>asynchronous collaborative composition</span>
-        </span>
-        <ul className="navbar-nav flex-row">
-          <li className='nav-item mx-2'>
-            <a
-              className='btn btn-outline-primary'
-              target='_blank'
-              href={`https://tinyurl.com/create.php?url=${encodeURIComponent(location.href)}`}>
-              Shorten and Share
-            </a>
-          </li>
-          <li className='nav-item mx-2'>
-            <a className='nav-link' href='//www.yuzeh.com'>Home</a>
-          </li>
-        </ul>
-      </nav>
+      <NavBar 
+        shortLink={shortLink}
+        shortLinkedRenderState={shortLinkedRenderState}
+        renderState={renderState}
+        onShortLinkClick={() => this.generateShortLink()}
+        />
       <div className="container-fluid content">
         <div className="row">
           <div className="col-lg-6 col-md-12">
@@ -81,6 +71,8 @@ class App extends React.Component {
               &copy; 2018 <a href="https://twitter.com/yuzeh">@yuzeh</a>
               &nbsp;&middot;&nbsp;
               <a href="https://github.com/yuzeh/abcbin">source</a>
+              &nbsp;&middot;&nbsp;
+              <a href="https://abcjs.net">built on top of abc.js</a>
             </span>
           </div>
         </div>
@@ -114,12 +106,87 @@ class App extends React.Component {
       if (window.location.hash !== newHash) {
         window.location.hash = newHash;
       }
-      this.setState({ renderState: editorState, parseErrors });
+      this.setState({ renderState: editorState, parseErrors, });
     }
   }
 
   editorUpdate(editorState) {
     this.setState({ editorState });
+  }
+
+  generateShortLink() {
+    request({
+      method: 'POST',
+      uri: 'https://api.short.cm/links',
+      body: {
+        domain: 'go.yuzeh.com',
+        originalURL: location.href,
+      },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'nqHRiVmKJEQOBgcF',
+      },
+      json: true,
+    }).then(response => {
+      const { renderState } = this.state;
+      this.setState({
+        shortLink: response.shortURL,
+        shortLinkedRenderState: renderState,
+      });
+    }, error => {
+      console.error(error);
+      this.setState({ shortLinkedRenderState: 'error' });
+    })
+  }
+}
+
+class NavBar extends React.Component {
+  render() {
+    const { shortLink, shortLinkedRenderState, renderState, onShortLinkClick } = this.props;
+    return <nav class="navbar sticky-top navbar-light bg-light">
+      <span class="navbar-brand" href="#">
+        <strong>abcbin</strong>
+        &nbsp;
+        <span className='navbar-text'>asynchronous collaborative composition</span>
+      </span>
+      <ul className="navbar-nav flex-row">
+        {shortLinkedRenderState === 'error'
+          ? <li className='nav-item mx-2'>An error occurred! Check the console logs.</li>
+          : shortLink
+          ? <ShortLinkDisplay shortLink={shortLink} isStale={shortLinkedRenderState !== renderState} />
+          : null
+        }
+        <li className='nav-item mx-2'>
+          <a
+            className='btn btn-outline-primary'
+            tabIndex={0}
+            onClick={onShortLinkClick}
+          >
+            Shorten and Share
+          </a>
+        </li>
+        <li className='nav-item mx-2'>
+          <a className='nav-link' href='https//www.yuzeh.com'>Home</a>
+        </li>
+      </ul>
+    </nav>;
+  }
+}
+
+class ShortLinkDisplay extends React.PureComponent {
+  render() {
+    const { shortLink, isStale } = this.props;
+    const input = <input className='form-control' readOnly={true} value={shortLink} />;
+    let contents = input;
+    if (isStale) {
+      contents = <div className='input-group'>
+        <div className='input-group-prepend'>
+          <div className='input-group-text'>Stale</div>
+        </div>
+        {input}
+      </div>;
+    }
+    return <li className='nav-item mx-2'>{contents}</li>;
   }
 }
 
