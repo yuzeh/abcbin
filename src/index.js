@@ -166,7 +166,7 @@ class NavBar extends React.Component {
           </a>
         </li>
         <li className='nav-item mx-2'>
-          <a className='nav-link' href='https//www.yuzeh.com'>Home</a>
+          <a className='nav-link' href='https://www.yuzeh.com'>Home</a>
         </li>
       </ul>
     </nav>;
