@@ -107,6 +107,10 @@ module.exports = {
 
 	plugins: [
 		new CleanWebpackPlugin(['dist']),
+		new CopyWebpackPlugin([
+			{ from: '_headers', to: '.', },
+			{ from: '_redirects', to: '.', },
+		]),
 		new HtmlWebpackPlugin({
 			template: 'src/index.html',
 			title: 'abcbin',
