@@ -210,8 +210,8 @@ class AbcRenderer extends React.Component {
       abcjs.renderMidi(`${this.uniqueId}-playback`, notation, {
         inlineControls: {
           loopToggle: true,
-          generateDownload: true,
         }
+        generateDownload: true,
       });
       this.lastNotation = notation;
     }
