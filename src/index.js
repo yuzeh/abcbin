@@ -72,7 +72,7 @@ class App extends React.Component {
         <div className='row'>
           <div className='col d-flex justify-content-center'>
             <span className='text-muted'>
-              &copy; 2018 <a href="https://twitter.com/yuzeh">@yuzeh</a>
+              &copy; 2019 <a href="https://twitter.com/yuzeh">@yuzeh</a>
               &nbsp;&middot;&nbsp;
               <a href="https://github.com/yuzeh/abcbin">source</a>
               &nbsp;&middot;&nbsp;
